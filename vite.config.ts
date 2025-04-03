@@ -57,7 +57,7 @@ export default defineConfig({
       },
     },
     cssCodeSplit: true,
-    minify: 'terser', // Forcer l'utilisation de Terser pour la minification
+    minify: 'terser', // On force l'utilisation de Terser pour la minification
     terserOptions: {
       format: {
         comments: false,
@@ -66,7 +66,13 @@ export default defineConfig({
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn', 'console.error'],
+        pure_funcs: [
+          'console.log',
+          'console.info',
+          'console.debug',
+          'console.warn',
+          'console.error'
+        ],
         passes: 3,
         ecma: 2020,
       },
