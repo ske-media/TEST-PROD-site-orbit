@@ -3,14 +3,17 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { compression } from 'vite-plugin-compression2';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: 'classic', // Utilisation du runtime classique (peut aider pour certains projets)
+      jsxRuntime: 'classic',
       fastRefresh: true,
     }),
-    // Compression GZIP et Brotli pour optimiser la taille des assets
     compression({
       algorithm: 'gzip',
       exclude: [/\.(br)$/, /\.(gz)$/],
@@ -24,11 +27,11 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Assurez-vous que ces alias pointent vers les versions installées de vos dépendances
+      // Forcer l'utilisation d'une unique instance de React et ses dépendances
       react: path.resolve(__dirname, 'node_modules/react'),
       'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
       'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
-      // Vous pouvez ajouter d'autres alias ici si besoin (exemple pour lucide-react, etc.)
+      // Ajoute d'autres alias si nécessaire (ex. pour lucide-react, etc.)
     },
   },
   optimizeDeps: {
@@ -42,13 +45,12 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   build: {
-    sourcemap: true, // Activez les source maps pour faciliter le debugging en prod
+    sourcemap: true,
     target: 'esnext',
     modulePreload: { polyfill: false },
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Regrouper React, ReactDOM et React Router dans un même chunk
           if (
             id.includes('node_modules/react') ||
             id.includes('node_modules/react-dom') ||
@@ -64,10 +66,8 @@ export default defineConfig({
           }
         },
         assetFileNames: (assetInfo) => {
-          let extType = assetInfo.name.split('.').at(1);
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            extType = 'img';
-          }
+          const ext = path.extname(assetInfo.name).slice(1);
+          const extType = /^(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(ext) ? 'img' : ext;
           return `assets/${extType}/[name]-[hash][extname]`;
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
@@ -75,11 +75,11 @@ export default defineConfig({
       },
     },
     cssCodeSplit: true,
-    minify: 'terser', // Forcer l'utilisation de Terser pour la minification
+    minify: 'terser',
     terserOptions: {
       format: {
         comments: false,
-        beautify: false, // Gardez false pour la prod, mettez true temporairement pour le débogage
+        beautify: false,
         ecma: 2020,
       },
       compress: {
@@ -95,8 +95,6 @@ export default defineConfig({
         passes: 3,
         ecma: 2020,
       },
-      // Pour faciliter l'analyse en production, on peut désactiver temporairement le mangling.
-      // ATTENTION : Pour la prod, activez le mangling pour obtenir un bundle plus compact.
       mangle: false,
     },
     reportCompressedSize: false,
