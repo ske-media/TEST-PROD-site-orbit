@@ -2,16 +2,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { compression } from 'vite-plugin-compression2';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import path from 'node:path';
 
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: 'classic',
+      jsxRuntime: 'automatic',
       fastRefresh: true,
     }),
     compression({
@@ -25,15 +21,6 @@ export default defineConfig({
       threshold: 1024,
     }),
   ],
-  resolve: {
-    alias: {
-      // Forcer l'utilisation d'une unique instance de React et ses dépendances
-      react: path.resolve(__dirname, 'node_modules/react'),
-      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-      'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
-      // Ajoute d'autres alias si nécessaire (ex. pour lucide-react, etc.)
-    },
-  },
   optimizeDeps: {
     include: [
       'react',
@@ -42,7 +29,6 @@ export default defineConfig({
       'react/jsx-runtime',
       'react/jsx-dev-runtime'
     ],
-    exclude: ['lucide-react'],
   },
   build: {
     sourcemap: true,
@@ -51,11 +37,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (
-            id.includes('node_modules/react') ||
-            id.includes('node_modules/react-dom') ||
-            id.includes('node_modules/react-router-dom')
-          ) {
+          if (id.includes('node_modules/react')) {
             return 'react';
           }
           if (id.includes('node_modules/lucide-react')) {
@@ -66,8 +48,10 @@ export default defineConfig({
           }
         },
         assetFileNames: (assetInfo) => {
-          const ext = path.extname(assetInfo.name).slice(1);
-          const extType = /^(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(ext) ? 'img' : ext;
+          let extType = assetInfo.name.split('.').at(1);
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = 'img';
+          }
           return `assets/${extType}/[name]-[hash][extname]`;
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
@@ -79,7 +63,6 @@ export default defineConfig({
     terserOptions: {
       format: {
         comments: false,
-        beautify: false,
         ecma: 2020,
       },
       compress: {
@@ -95,7 +78,6 @@ export default defineConfig({
         passes: 3,
         ecma: 2020,
       },
-      mangle: false,
     },
     reportCompressedSize: false,
     assetsInlineLimit: 8192,
