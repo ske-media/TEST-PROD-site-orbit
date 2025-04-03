@@ -1,4 +1,3 @@
-// src/App.tsx
 import React, { useEffect, useState, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Helmet, HelmetProvider } from 'react-helmet-async';

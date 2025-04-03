@@ -1,5 +1,3 @@
-// src/components/AppPage/ProcessSection.tsx
-
 import React, { useEffect, useRef } from 'react';
 import { motion, useAnimation, useInView, Variants } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';

@@ -1,5 +1,6 @@
-// src/components/TestContext.tsx
 import React from 'react';
+
+console.log("React in TestContext:", React);
 
 const TestContext = React.createContext({});
 
